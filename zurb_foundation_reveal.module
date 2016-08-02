@@ -1,0 +1,102 @@
+<?php
+/**
+ * Implements hook_theme().
+ */
+function zurb_foundation_reveal_theme() {
+  $return = array();
+
+  $return['zurb_foundation_reveal'] = array(
+    'variables' => array(
+      // The text to display in the link.
+      'text' => '',
+      // Whether the text uses HTML.
+      'html' => FALSE,
+      // Whether the reveal uses AJAX content.
+      // This can either be set to true, to use the link's href property or be
+      // a URL to load the content from. Note that setting this parameter will
+      // override the contents of the "reveal" variable.
+      'ajax' => FALSE,
+      // The path for the link's href property. This is only really useful if
+      // you want to set 'ajax' to TRUE (see above).
+      'path' => FALSE,
+      // The content for the reveal modal. Can be either a string or a render
+      // array.
+      'reveal' => '',
+      // Extra classes to add to the link.
+      'link_classes_array' => array('zurb-foundation-reveal'),
+      // Extra classes to add to the reveal modal.
+      'reveal_classes_array' => array('expand'),
+    ),
+    'function' => 'theme_zurb_foundation_reveal',
+  );
+  
+  return $return;
+}
+
+/**
+ * Theme function to create Zurb Foundation reveal modals.
+ *
+ * @see zurb_foundation_theme()
+ * @see zurb_foundation_preprocess_region()
+ * @see _zurb_foundation_reveal()
+ */
+function theme_zurb_foundation_reveal($variables) {
+  // Generate unique IDs.
+  static $counter = 0;
+
+  // Prepare reveal markup.
+  $reveal_id = 'zf-reveal-' . ++$counter;
+  $variables['reveal_classes_array'][] = 'reveal-modal';
+  $reveal_classes = implode(' ', $variables['reveal_classes_array']);
+
+  // Render reveal contents if applicable.
+  if (is_array($variables['reveal'])) {
+    $variables['reveal'] = drupal_render($variables['reveal']);
+  }
+
+  $reveal = array(
+    '#markup' => $variables['reveal'],
+    '#prefix' => '<div id="' . $reveal_id . '" class="' . $reveal_classes . '">',
+    '#suffix' => '<a class="close-reveal-modal">&#215;</a></div>',
+  );
+  
+  drupal_add_js(drupal_get_path('module', 'zurb_foundation_reveal') . '/assets/foundation.js');
+  drupal_add_js(drupal_get_path('module', 'zurb_foundation_reveal') . '/assets/reveal.js');
+  drupal_add_js(drupal_get_path('module', 'zurb_foundation_reveal') . '/assets/app.js');
+  drupal_add_css(drupal_get_path('module', 'zurb_foundation_reveal') . '/assets/reveal.css');
+  drupal_add_js(array('zurbFoundationReveals' => array(
+        $reveal_id => array(
+          'reveal' => drupal_render($reveal),
+        )
+      )
+    ),
+    array(
+      'type' => 'setting',
+    )
+  );
+
+  $build = array(
+    '#theme' => 'link',
+    '#text' => $variables['text'],
+    '#path' => $variables['path'] ? $variables['path'] : 'javascript:',
+    '#options' => array(
+      'attributes' => array(
+        'id' => 'zf-reveal-link-' . $counter,
+        'class' => $variables['link_classes_array'],
+        'data-reveal-id' => $reveal_id,
+      ),
+      'html' => $variables['html'],
+      'external' => TRUE,
+    ),
+  );
+
+  // Check for AJAX.
+  if ($variables['ajax']) {
+    if ($variables['ajax'] === TRUE) {
+      $variables['ajax'] = 'true';
+    }
+    $build['#options']['attributes']['data-reveal-ajax'] = $variables['ajax'];
+  }
+
+  return drupal_render($build);
+}

@@ -1,0 +1,4 @@
+name = Zurb Foundation Reveal
+description = Port of the Zurb Foundation theme implementation of the reveal module.
+core = 7.x
+dependencies[] = libraries
