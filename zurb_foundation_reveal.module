@@ -29,7 +29,7 @@ function zurb_foundation_reveal_theme() {
     ),
     'function' => 'theme_zurb_foundation_reveal',
   );
-  
+
   return $return;
 }
 
@@ -83,13 +83,6 @@ function theme_zurb_foundation_reveal($variables) {
     '#suffix' => '<a class="close-reveal-modal">&#215;</a></div>',
   );
 
-//  drupal_add_js(drupal_get_path('module', 'zurb_foundation_reveal') . '/assets/foundation.js',
-//    array('weight' => 90, 'scope' => 'footer'));
-//  drupal_add_js(drupal_get_path('module', 'zurb_foundation_reveal') . '/assets/reveal.js',
-//    array('weight' => 100, 'scope' => 'footer'));
-//  drupal_add_js(drupal_get_path('module', 'zurb_foundation_reveal') . '/assets/app.js',
-//    array('weight' => 110, 'scope' => 'footer'));
-//  drupal_add_css(drupal_get_path('module', 'zurb_foundation_reveal') . '/assets/reveal.css');
   drupal_add_js(array('zurbFoundationReveals' => array(
         $reveal_id => array(
           'reveal' => drupal_render($reveal),
@@ -114,8 +107,10 @@ function theme_zurb_foundation_reveal($variables) {
       'html' => $variables['html'],
       'external' => TRUE,
     ),
-    '#attached' => array('libraries' => array('zurb_foundation_reveal'))
   );
+
+  // Load the 'zurb_foundation_reveal' lib that is using the libraries module.
+  libraries_load('zurb_foundation_reveal');
 
   // Check for AJAX.
   if ($variables['ajax']) {
