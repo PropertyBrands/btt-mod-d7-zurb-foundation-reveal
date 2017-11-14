@@ -5,8 +5,8 @@
         $('body', context).once('zurb-foundation-reveals', function() {
           for(var rv in Drupal.settings.zurbFoundationReveals) {
             var rvobj = $(Drupal.settings.zurbFoundationReveals[rv].reveal);
-            Drupal.attachBehaviors(rvobj, settings);
             $('body', context).append(rvobj);
+            Drupal.attachBehaviors($('body', context), settings);
           }
           $(document).foundation();
         });
